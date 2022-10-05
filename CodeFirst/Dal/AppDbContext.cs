@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CodeFirst.Dto;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Configuration;
 
@@ -43,7 +44,12 @@ namespace CodeFirst.Dal
         public DbSet<Category> Categories { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
+
+        public DbSet<Person> People { get; set; }
+
         public DbSet<QueriedProduct> QueriedProducts { get; set; }
+        public DbSet<ProductDto> ProductDtos { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -60,7 +66,7 @@ namespace CodeFirst.Dal
             modelBuilder.Entity<Product>().Property(p => p.DiscountPrice).HasPrecision(9, 2);
 
             #region Constraints
-            modelBuilder.Entity<Product>().HasCheckConstraint("PriceDiscountCheck","[Price]>[DiscountPrice]");
+            modelBuilder.Entity<Product>().HasCheckConstraint("PriceDiscountCheck", "[Price]>[DiscountPrice]");
 
             #endregion
 
@@ -80,6 +86,7 @@ namespace CodeFirst.Dal
 
             #region Keyless Entity
             modelBuilder.Entity<QueriedProduct>().HasNoKey();
+            modelBuilder.Entity<ProductDto>().HasNoKey();
             #endregion
 
             #region Owned Entity

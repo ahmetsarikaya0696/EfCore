@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeFirst.Dal
+namespace CodeFirst.Dto
 {
     //[Keyless]
     public class QueriedProduct

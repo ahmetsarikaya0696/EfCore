@@ -38,6 +38,25 @@ namespace CodeFirst.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("CodeFirst.Dal.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("People");
+                });
+
             modelBuilder.Entity("CodeFirst.Dal.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -121,7 +140,7 @@ namespace CodeFirst.Migrations
                     b.Property<int>("Product_ID")
                         .HasColumnType("int");
 
-                    b.ToTable("QueriedProduct");
+                    b.ToTable("QueriedProducts");
                 });
 
             modelBuilder.Entity("CodeFirst.Dal.Student", b =>

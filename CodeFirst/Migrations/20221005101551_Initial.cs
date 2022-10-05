@@ -23,7 +23,21 @@ namespace CodeFirst.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "QueriedProduct",
+                name: "People",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_People", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QueriedProducts",
                 columns: table => new
                 {
                     Product_ID = table.Column<int>(type: "int", nullable: false),
@@ -162,10 +176,13 @@ namespace CodeFirst.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "People");
+
+            migrationBuilder.DropTable(
                 name: "ProductFeatures");
 
             migrationBuilder.DropTable(
-                name: "QueriedProduct");
+                name: "QueriedProducts");
 
             migrationBuilder.DropTable(
                 name: "StudentTeacher");

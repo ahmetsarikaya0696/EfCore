@@ -1,11 +1,84 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CodeFirst.Dal;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 Initializer.Build();
 
 using (var _context = new AppDbContext())
 {
+    #region Raw Sql
+    var products = _context.Products.FromSqlRaw("SELECT * FROM Products").ToList();
+
+    var id = new SqlParameter("@_Id", 5);
+    var productWithIdFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Id = @_Id", id).First();
+
+    var price = new SqlParameter("@_Price", 300);
+    var productsWithPriceFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Price > @_Price", price).ToList();
+
+    var productDto = _context.ProductDtos.FromSqlRaw("SELECT Id, Name, Price FROM Products").First();
+
+    #endregion
+
+    #region FullOuterJoin
+    //var left = (from p in _context.Products
+    //            join pf in _context.ProductFeatures on p.Id equals pf.Id into pfList
+    //            from pf in pfList.DefaultIfEmpty()
+    //            select new { p, pf }).ToList();
+
+    //var right = (from pf in _context.ProductFeatures
+    //             join p in _context.Products on pf.Id equals p.Id into pList
+    //             from p in pList.DefaultIfEmpty()
+    //             select new { p, pf }).ToList();
+
+    //var fullOuterJoin = left.Union(right);
+    #endregion
+
+    #region LeftJoin
+    //var result = (from p in _context.Products
+    //              join pf in _context.ProductFeatures on p.Id equals pf.Id into pfList
+    //              from pf in pfList.DefaultIfEmpty()
+    //              select new { p, pf }).ToList();
+    #endregion
+
+    #region InnerJoin
+    //// nav prop olmadığı zamanlarda tabloları birbirine bağlamak için yapılır.
+    //var result = _context.Categories.Join(_context.Products, c => c.Id, p => p.CategoryId, (c, p) => new
+    //{
+    //    CategoryName = c.Name,
+    //    ProductName = p.Name,
+    //    ProductPrice = p.Price
+    //}).ToList();
+
+    //var result2 = (from c in _context.Categories
+    //               join p in _context.Products on c.Id equals p.CategoryId
+    //               select new
+    //               {
+    //                   CategoryName = c.Name,
+    //                   ProductName = p.Name,
+    //                   ProductPrice = p.Price
+    //               });
+
+    //var result3 = _context.Categories.Join(_context.Products, c => c.Id, p => p.CategoryId, (c, p) => new { c, p })
+    //                                 .Join(_context.ProductFeatures, cp => cp.p.Id, pf => pf.Id, (cp, pf) => new
+    //                                 {
+    //                                     CategoryName = cp.c.Name,
+    //                                     ProductName = cp.p.Name,
+    //                                     ProductPrice = cp.p.Price,
+    //                                     ProductHeight = pf.Height
+    //                                 }).ToList();
+    #endregion
+
+    #region ClientServerEvaluation
+    //_context.People.Add(new() { Name = "Ahmet", Phone = "05312228514" });
+    //_context.People.Add(new() { Name = "Mehmet", Phone = "05332238533" });
+    //_context.SaveChanges();
+
+    ////var people = _context.People.Where(p => FormatPhone(p.Phone) == "5312228514"); // SQL tarafında FormatPhone isminde bir fonksiyon yok.
+    //var people = _context.People.ToList().Where(p => FormatPhone(p.Phone) == "5312228514"); // Data memorye alındı.
+
+    #endregion
+
     #region Constraint
     //var category = new Category() { Name = "Kalemler" };
 
@@ -365,3 +438,6 @@ using (var _context = new AppDbContext())
     //});
     #endregion
 }
+
+
+string FormatPhone(string phone) => phone.Substring(1, phone.Length - 1);
