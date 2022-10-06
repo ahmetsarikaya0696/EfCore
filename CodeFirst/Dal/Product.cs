@@ -51,6 +51,8 @@ namespace CodeFirst.Dal
 
         public ProductFeature ProductFeature { get; set; }
 
+        public bool isDeleted { get; set; }
+
         #region Relation Configuration
         //[ForeignKey("Category_Id")]
         //public Category Category { get; set; }

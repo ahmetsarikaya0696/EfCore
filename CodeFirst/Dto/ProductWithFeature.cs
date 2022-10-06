@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CodeFirst.Dto
 {
     //[Keyless]
-    public class QueriedProduct
+    public class ProductWithFeature
     {
         public int Product_ID { get; set; }
         public string CategoryName { get; set; }

@@ -1,22 +1,53 @@
-﻿// See https://aka.ms/new-console-template for more information
-using CodeFirst.Dal;
+﻿using CodeFirst.Dal;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 Initializer.Build();
 
+#region Pagination
+static List<Product> GetPaginatedProducts(int pageNumber, int itemPerPage)
+{
+    using (var _context = new AppDbContext())
+    {
+        int skip = (pageNumber - 1) * itemPerPage;
+        var productsWithPage = _context.Products.OrderByDescending(p => p.Id)
+                                                .Skip(skip)
+                                                .Take(itemPerPage)
+                                                .ToList();
+
+        return productsWithPage;
+    }
+}
+
+//GetPaginatedProducts(1, 3).ForEach(p => Console.WriteLine($"Id : {p.Id}\r\nName : {p.Name}"));
+#endregion
+
 using (var _context = new AppDbContext())
 {
+    #region Global Query Filters
+    //var products = _context.Products.ToList(); // Global query filter uygulanmış şekilde gelir
+    //var products = _context.Products.IgnoreQueryFilters().ToList(); // Global query filter uygulanmamış şekilde gelir
+    #endregion
+
+    #region ToView
+    //var products = _context.ProductWithCategoryAndFeatures.ToList();
+    #endregion
+
+    #region ToSqlQuery ile kod merkezileştirme
+    //.ToSqlQuery("SELECT Id,Name,Price FROM Products"); metodu ile kod merkezileştirildi.
+    //var products = _context.ProductDtos.ToList();
+    #endregion
+
     #region Raw Sql
-    var products = _context.Products.FromSqlRaw("SELECT * FROM Products").ToList();
+    //var products = _context.Products.FromSqlRaw("SELECT * FROM Products").ToList();
 
-    var id = new SqlParameter("@_Id", 5);
-    var productWithIdFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Id = @_Id", id).First();
+    //var id = new SqlParameter("@_Id", 5);
+    //var productWithIdFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Id = @_Id", id).First();
 
-    var price = new SqlParameter("@_Price", 300);
-    var productsWithPriceFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Price > @_Price", price).ToList();
+    //var price = new SqlParameter("@_Price", 300);
+    //var productsWithPriceFilter = _context.Products.FromSqlRaw($"SELECT * FROM Products WHERE Price > @_Price", price).ToList();
 
-    var productDto = _context.ProductDtos.FromSqlRaw("SELECT Id, Name, Price FROM Products").First();
+    //var productDto = _context.ProductDtos.FromSqlRaw("SELECT Id, Name, Price FROM Products").First();
 
     #endregion
 
@@ -367,7 +398,7 @@ using (var _context = new AppDbContext())
     //        Console.WriteLine($"CHANGE_TRACKER\r\nId : {product.Id} \r\nName : {product.Name} \r\nStock : {product.Stock} \r\nPrice : {product.Price}**");
     //    }
     //});
-    await _context.SaveChangesAsync();
+    //await _context.SaveChangesAsync();
     #endregion
 
     #region Track edilmeyen entity için Update()
@@ -424,7 +455,7 @@ using (var _context = new AppDbContext())
 
     //await _context.SaveChangesAsync();
     //Console.WriteLine($"State After SaveChangesAsync : {_context.Entry(newProduct).State}");
-    #endregion 
+    #endregion
     #endregion
 
     #region Listing Products

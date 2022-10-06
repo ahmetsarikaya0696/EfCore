@@ -44,10 +44,11 @@ namespace CodeFirst.Dal
         public DbSet<Category> Categories { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
-
         public DbSet<Person> People { get; set; }
+        public DbSet<ProductWithCategoryAndFeature> ProductWithCategoryAndFeatures { get; set; }
 
-        public DbSet<QueriedProduct> QueriedProducts { get; set; }
+
+        public DbSet<ProductWithFeature> QueriedProducts { get; set; }
         public DbSet<ProductDto> ProductDtos { get; set; }
 
 
@@ -61,6 +62,17 @@ namespace CodeFirst.Dal
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Global Query Filters
+            modelBuilder.Entity<Product>().Property(p => p.isDeleted).HasDefaultValue(false);
+            modelBuilder.Entity<Product>().HasQueryFilter(p => !p.isDeleted);
+            #endregion
+
+            #region ToView
+            modelBuilder.Entity<ProductWithCategoryAndFeature>().HasNoKey()
+                                                                .ToView("ProductsWithFeature");
+
+            #endregion
+
             // Precision
             modelBuilder.Entity<Product>().Property(p => p.Price).HasPrecision(9, 2);
             modelBuilder.Entity<Product>().Property(p => p.DiscountPrice).HasPrecision(9, 2);
@@ -85,8 +97,9 @@ namespace CodeFirst.Dal
             #endregion
 
             #region Keyless Entity
-            modelBuilder.Entity<QueriedProduct>().HasNoKey();
-            modelBuilder.Entity<ProductDto>().HasNoKey();
+            modelBuilder.Entity<ProductWithFeature>().HasNoKey();
+            modelBuilder.Entity<ProductDto>().HasNoKey()
+                                             .ToSqlQuery("SELECT Id,Name,Price FROM Products");
             #endregion
 
             #region Owned Entity
