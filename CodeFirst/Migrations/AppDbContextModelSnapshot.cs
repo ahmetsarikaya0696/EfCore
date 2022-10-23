@@ -89,6 +89,11 @@ namespace CodeFirst.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -123,26 +128,6 @@ namespace CodeFirst.Migrations
                     b.ToTable("ProductFeatures");
                 });
 
-            modelBuilder.Entity("CodeFirst.Dal.QueriedProduct", b =>
-                {
-                    b.Property<string>("CategoryName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Height")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Product_ID")
-                        .HasColumnType("int");
-
-                    b.ToTable("QueriedProducts");
-                });
-
             modelBuilder.Entity("CodeFirst.Dal.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -170,6 +155,62 @@ namespace CodeFirst.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("CodeFirst.Dto.ProductDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ToTable("ProductDtos");
+
+                    b.ToSqlQuery("SELECT Id,Name,Price FROM Products");
+                });
+
+            modelBuilder.Entity("CodeFirst.Dto.ProductWithCategoryAndFeature", b =>
+                {
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductHeight")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductWidth")
+                        .HasColumnType("int");
+
+                    b.ToView("ProductsWithFeature");
+                });
+
+            modelBuilder.Entity("CodeFirst.Dto.ProductWithFeature", b =>
+                {
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Height")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Product_ID")
+                        .HasColumnType("int");
+
+                    b.ToTable("QueriedProducts");
                 });
 
             modelBuilder.Entity("StudentTeacher", b =>
@@ -201,9 +242,7 @@ namespace CodeFirst.Migrations
                 {
                     b.HasOne("CodeFirst.Dal.Product", "Product")
                         .WithOne("ProductFeature")
-                        .HasForeignKey("CodeFirst.Dal.ProductFeature", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CodeFirst.Dal.ProductFeature", "Id");
 
                     b.Navigation("Product");
                 });

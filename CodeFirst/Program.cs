@@ -1,6 +1,7 @@
 ﻿using CodeFirst.Dal;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 Initializer.Build();
 
@@ -24,6 +25,85 @@ static List<Product> GetPaginatedProducts(int pageNumber, int itemPerPage)
 
 using (var _context = new AppDbContext())
 {
+    #region StoredProcedure Function Farkları
+    /*
+     * SPler IN ve OUT parametreleri alırken
+     * Functionlar OUT parametresi almaz. Yani değer döndürmez.
+     * 
+     * SPler içinde Function kullanılabilirken.
+     * Functionların içinde SP kullanılamaz.
+     * 
+     * SPler içinde try catch blokları kullanılabilirken
+     * Functionlar içinde kullanılamaz.
+     * 
+     * SELECT cümlecikleri içinde Function kullanılabilirken
+     * SP kullanılamaz.
+     * 
+     * SPden sonra where ifadesi kullanıldığında hata verir fakat
+     * Functionlardan sonra kullanılabilir.
+     */
+    #endregion
+
+    #region Function
+    #region Table-Valued Function
+    ////Parametresiz Func
+    //var products = _context.ProductWithCategoryAndFeatures.ToList();
+
+    ////Parametre Alan Func 1.Yol
+    //int categoryId = 1;
+    //var products = _context.QueriedProducts.FromSqlInterpolated($"select * from FcProductfullWithParameters({categoryId})");
+
+    ////Parametre Alan Func 2.Yol
+    var product = _context.GetProductWithFeatures(1).ToList();
+
+
+    #endregion
+
+    #region Scalar-Valued Function
+    //var count = _context.GetProductCount(3); // Scalar-Valued metotlar tek başına kullanılamaz.
+
+    var categories = _context.Categories.Select(x => new
+    {
+        CategoryName = x.Name,
+        ProductCount = _context.GetProductCount(x.Id)
+    }).ToList();
+
+    int categoryId = 1;
+    var productCount = _context.ProductCount.FromSqlInterpolated($"SELECT dbo.fc_get_product_count({categoryId}) AS Count").First().Count;
+    #endregion
+
+    #endregion
+
+    #region StoredProcedure
+    //// Derleme ve execution plan sp ilk oluştuğunda meydana gelir ve bir daha oluşmaz. Bu yüzden normal sorgulara göre daha hızlıdır.
+    //// ssms tarafında sp oluşturan kod: CREATE PROCEDURE SpGetProducts AS BEGIN SELECT * FROM Products END 
+    //var products = _context.Products.FromSqlRaw("exec SpGetProducts").ToList();
+
+    //var productWithCategoryAndFeature = _context.ProductWithCategoryAndFeatures.FromSqlRaw("exec SpGetProductsFull").ToList();
+
+    //int categoryId = 1;
+    //decimal price = 50;
+    //var productsFullWithParameters = _context.ProductWithCategoryAndFeatures.FromSqlInterpolated($"exec SpGetProductsFullWithParameters {categoryId},{price}").ToList();
+
+
+    //Product product = new()
+    //{
+    //    Name = "Product",
+    //    Price = 300,
+    //    Stock = 70,
+    //    Barcode = 123,
+    //    DiscountPrice = 50,
+    //    CategoryId = 1
+    //};
+
+    //var newProductId = new SqlParameter("@newId", SqlDbType.Int);
+    //newProductId.Direction = ParameterDirection.Output;
+
+    //_context.Database.ExecuteSqlInterpolated($"EXEC SpInsertProduct {product.Name},{product.Price},{product.DiscountPrice},{product.Stock},{product.Barcode},{product.CategoryId}, {newProductId} out");
+
+    //var productId = newProductId.Value;
+    #endregion
+
     #region Global Query Filters
     //var products = _context.Products.ToList(); // Global query filter uygulanmış şekilde gelir
     //var products = _context.Products.IgnoreQueryFilters().ToList(); // Global query filter uygulanmamış şekilde gelir

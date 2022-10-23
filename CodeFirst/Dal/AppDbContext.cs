@@ -50,7 +50,22 @@ namespace CodeFirst.Dal
 
         public DbSet<ProductWithFeature> QueriedProducts { get; set; }
         public DbSet<ProductDto> ProductDtos { get; set; }
+        public DbSet<ProductCount> ProductCount { get; set; }
 
+
+        #region Function Parametreli
+        // Table-Valued
+        public IQueryable<ProductWithFeature> GetProductWithFeatures(int categoryId)
+        {
+            return FromExpression(() => GetProductWithFeatures(categoryId));
+        }
+
+        //Scalar-Valued
+        public int GetProductCount(int categoryId)
+        {
+            throw new NotSupportedException();
+        }
+        #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -62,6 +77,16 @@ namespace CodeFirst.Dal
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Function Parametreli
+            // Table-Valued
+            modelBuilder.HasDbFunction(typeof(AppDbContext).GetMethod(nameof(GetProductWithFeatures), new[] { typeof(int) }))
+                        .HasName("FcProductfullWithParameters");
+
+            // Scalar-Valued
+            modelBuilder.HasDbFunction(typeof(AppDbContext).GetMethod(nameof(GetProductCount), new[] { typeof(int) }))
+                        .HasName("fc_get_product_count");
+            #endregion
+
             #region Global Query Filters
             modelBuilder.Entity<Product>().Property(p => p.isDeleted).HasDefaultValue(false);
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.isDeleted);
@@ -97,9 +122,12 @@ namespace CodeFirst.Dal
             #endregion
 
             #region Keyless Entity
+            //modelBuilder.Entity<ProductWithCategoryAndFeature>().HasNoKey();
+            modelBuilder.Entity<ProductWithCategoryAndFeature>().ToFunction("FcProductfull");
             modelBuilder.Entity<ProductWithFeature>().HasNoKey();
             modelBuilder.Entity<ProductDto>().HasNoKey()
                                              .ToSqlQuery("SELECT Id,Name,Price FROM Products");
+            modelBuilder.Entity<ProductCount>().HasNoKey();
             #endregion
 
             #region Owned Entity
@@ -173,7 +201,9 @@ namespace CodeFirst.Dal
             modelBuilder.Entity<Product>()
                                 .HasOne(p => p.ProductFeature)
                                 .WithOne(pf => pf.Product)
-                                .HasForeignKey<ProductFeature>(pf => pf.Id);
+                                .HasForeignKey<ProductFeature>(pf => pf.Id)
+                                .IsRequired(false);
+
             #endregion
 
             #region many-to-many Relation Configuration

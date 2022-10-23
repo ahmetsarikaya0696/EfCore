@@ -37,6 +37,18 @@ namespace CodeFirst.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductDtos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                });
+
+            migrationBuilder.CreateTable(
                 name: "QueriedProducts",
                 columns: table => new
                 {
@@ -93,7 +105,8 @@ namespace CodeFirst.Migrations
                     Stock = table.Column<int>(type: "int", nullable: false),
                     Barcode = table.Column<long>(type: "bigint", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    isDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -147,8 +160,7 @@ namespace CodeFirst.Migrations
                         name: "FK_ProductFeatures_Products_Id",
                         column: x => x.Id,
                         principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -177,6 +189,9 @@ namespace CodeFirst.Migrations
         {
             migrationBuilder.DropTable(
                 name: "People");
+
+            migrationBuilder.DropTable(
+                name: "ProductDtos");
 
             migrationBuilder.DropTable(
                 name: "ProductFeatures");
