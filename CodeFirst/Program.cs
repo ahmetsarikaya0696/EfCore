@@ -1,5 +1,4 @@
 ﻿using CodeFirst.Dal;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 

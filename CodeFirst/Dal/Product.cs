@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CodeFirst.Dal
+﻿namespace CodeFirst.Dal
 {
     //[Table("Ürünler Tablosu", Schema ="Ürünler")]
     //[Index(nameof(Name))]
