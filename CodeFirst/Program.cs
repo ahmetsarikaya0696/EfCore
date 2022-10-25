@@ -24,6 +24,33 @@ static List<Product> GetPaginatedProducts(int pageNumber, int itemPerPage)
 
 using (var _context = new AppDbContext())
 {
+    #region Transaction
+    // Tek bir SaveChanges() kullanılıyorsa scope açmaya gerek yoktur.
+
+    using (var transaction = _context.Database.BeginTransaction())
+    {
+        Category category = new() { Name = "Telefonlar" };
+        _context.Categories.Add(category);
+        _context.SaveChanges();
+
+        Product product = new()
+        {
+            Name = "Kılıf 1",
+            Price = 123,
+            DiscountPrice = 100,
+            Stock = 123,
+            Barcode = 123,
+            CategoryId = category.Id,
+            ProductFeature = new ProductFeature() { Color = "Red", Width = 123, Height = 123 }
+        };
+
+        _context.Products.Add(product);
+        _context.SaveChanges();
+        transaction.Commit();
+    }
+    #endregion
+
+
     #region StoredProcedure Function Farkları
     /*
      * SPler IN ve OUT parametreleri alırken
@@ -53,7 +80,7 @@ using (var _context = new AppDbContext())
     //var products = _context.QueriedProducts.FromSqlInterpolated($"select * from FcProductfullWithParameters({categoryId})");
 
     ////Parametre Alan Func 2.Yol
-    var product = _context.GetProductWithFeatures(1).ToList();
+    //var product = _context.GetProductWithFeatures(1).ToList();
 
 
     #endregion
